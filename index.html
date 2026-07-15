@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deutsch-Test — адаптивный тест уровня немецкого</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main class="container">
+
+    <!-- ─────────── Экран старта ─────────── -->
+    <section id="screen-start" class="screen active">
+      <div class="card">
+        <div class="logo">🇩🇪</div>
+        <h1>Тест уровня немецкого языка</h1>
+        <p class="subtitle">Адаптивный тест по шкале CEFR: A1 – C2</p>
+
+        <ul class="features">
+          <li><strong>Умный подбор вопросов.</strong> Сложность подстраивается под ваши ответы по модели IRT — как в TestDaF и Duolingo English Test.</li>
+          <li><strong>Быстро.</strong> Обычно 12–20 вопросов вместо сотни: тест завершается, как только уровень определён надёжно.</li>
+          <li><strong>Грамматика, лексика и чтение</strong> — банк из <span id="bank-size">72</span> заданий уровней A1–C2.</li>
+        </ul>
+
+        <p class="hint">Отвечайте честно и не пользуйтесь словарём — иначе результат будет завышен. Если не знаете ответ, нажмите «Не знаю».</p>
+
+        <button id="btn-start" class="btn btn-primary">Начать тест</button>
+      </div>
+    </section>
+
+    <!-- ─────────── Экран теста ─────────── -->
+    <section id="screen-quiz" class="screen">
+      <div class="card" id="card-quiz">
+        <div class="quiz-header">
+          <div class="quiz-meta">
+            <span id="q-counter">Вопрос 1</span>
+            <span class="muted" id="q-range">всего 12–20</span>
+          </div>
+          <span class="level-chip" id="q-level" title="Уровень сложности вопроса">A1</span>
+        </div>
+        <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+
+        <blockquote class="passage" id="q-passage" lang="de" hidden></blockquote>
+        <h2 class="question" id="q-text" lang="de"></h2>
+
+        <div class="options" id="q-options" lang="de"></div>
+
+        <div class="quiz-footer">
+          <button id="btn-skip" class="btn btn-ghost">Не знаю →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────── Экран результата ─────────── -->
+    <section id="screen-result" class="screen">
+      <div class="card">
+        <p class="result-caption">Ваш уровень немецкого</p>
+        <div class="result-level" id="result-level">B1</div>
+        <h2 id="result-title"></h2>
+        <p class="result-desc" id="result-desc"></p>
+
+        <div class="scale">
+          <div class="scale-track">
+            <div class="scale-se" id="scale-se"></div>
+            <div class="scale-marker" id="scale-marker"></div>
+          </div>
+          <div class="scale-labels">
+            <span>A1</span><span>A2</span><span>B1</span><span>B2</span><span>C1</span><span>C2</span>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="stat-value" id="stat-questions">–</div><div class="stat-label">вопросов</div></div>
+          <div class="stat"><div class="stat-value" id="stat-correct">–</div><div class="stat-label">правильных</div></div>
+          <div class="stat"><div class="stat-value" id="stat-confidence">–</div><div class="stat-label">уверенность</div></div>
+        </div>
+
+        <h3>По навыкам</h3>
+        <div id="skills"></div>
+
+        <div class="trajectory-wrap">
+          <h3>Как менялась оценка уровня</h3>
+          <svg id="trajectory" viewBox="0 0 560 140"></svg>
+          <p class="muted small">Каждая точка — вопрос: зелёная — верный ответ, красная — неверный. Линия — оценка вашего уровня после каждого ответа.</p>
+        </div>
+
+        <button id="btn-restart" class="btn btn-primary">Пройти ещё раз</button>
+      </div>
+    </section>
+
+    <footer class="footer muted small">
+      Тест работает полностью в браузере — данные никуда не отправляются.
+    </footer>
+  </main>
+
+  <script src="js/questions.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
