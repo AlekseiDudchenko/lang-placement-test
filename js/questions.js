@@ -53,7 +53,7 @@ const QUESTIONS = [
   // ─────────────────────────── A2 ───────────────────────────
   { id: "a2-01", level: "A2", b: -1.6, skill: "gram",
     q: "Gestern ___ ich zu Hause geblieben.",
-    opts: ["bin", "habe", "war", "werde"] },
+    opts: ["bin", "habe", "ist", "werde"] },
   { id: "a2-02", level: "A2", b: -1.8, skill: "gram",
     q: "Ich habe den Film schon ___.",
     opts: ["gesehen", "sehen", "sah", "geseht"] },
@@ -285,3 +285,8 @@ const QUESTIONS = [
     opts: ["gegenüber anderen zurückfallen", "in einen Streit geraten",
            "in Vergessenheit geraten", "rückwärtsgewandt denken"] },
 ];
+
+// Экспорт для Node (тесты/симуляции); в браузере — глобальное имя.
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = { QUESTIONS };
+}

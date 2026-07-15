@@ -37,7 +37,6 @@
 
   let engine = null;
   let currentQuestion = null;
-  let shuffledOptions = [];
   let locked = false;
 
   const $ = (id) => document.getElementById(id);
@@ -75,7 +74,7 @@
     $("q-range").textContent = `всего ${minQuestions}–${maxQuestions}`;
     $("q-level").textContent = currentQuestion.level;
     $("q-level").dataset.level = currentQuestion.level;
-    $("progress-fill").style.width = `${Math.min(100, (n / maxQuestions) * 100)}%`;
+    $("progress-fill").style.width = `${engine.progress() * 100}%`;
 
     const passageEl = $("q-passage");
     if (currentQuestion.text) {
@@ -86,17 +85,18 @@
     }
     $("q-text").textContent = currentQuestion.q;
 
-    const correctText = currentQuestion.opts[0];
-    shuffledOptions = shuffle(currentQuestion.opts);
-
+    // Правильный вариант в банке всегда первый (индекс 0) — перемешиваем
+    // индексы и помечаем правильную кнопку через dataset, а не сравнением текста.
+    const order = shuffle(currentQuestion.opts.map((_, i) => i));
     const list = $("q-options");
     list.innerHTML = "";
-    shuffledOptions.forEach((opt) => {
+    order.forEach((optIdx) => {
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "option";
-      btn.textContent = opt;
-      btn.addEventListener("click", () => answer(opt === correctText, btn));
+      btn.textContent = currentQuestion.opts[optIdx];
+      if (optIdx === 0) btn.dataset.correct = "1";
+      btn.addEventListener("click", () => answer(optIdx === 0, btn));
       list.appendChild(btn);
     });
 
@@ -109,10 +109,9 @@
     if (locked) return;
     locked = true;
 
-    const correctText = currentQuestion.opts[0];
     for (const btn of document.querySelectorAll("#q-options .option")) {
       btn.disabled = true;
-      if (btn.textContent === correctText) btn.classList.add("is-correct");
+      if (btn.dataset.correct) btn.classList.add("is-correct");
     }
     if (clickedBtn && !correct) clickedBtn.classList.add("is-wrong");
 
@@ -165,10 +164,24 @@
       const pct = Math.round((s.correct / s.total) * 100);
       const row = document.createElement("div");
       row.className = "skill-row";
-      row.innerHTML =
-        `<div class="skill-head"><span>${SKILL_LABELS[key]}</span>` +
-        `<span class="skill-val">${s.correct}/${s.total}</span></div>` +
-        `<div class="skill-bar"><div class="skill-fill" style="width:${pct}%"></div></div>`;
+
+      const head = document.createElement("div");
+      head.className = "skill-head";
+      const name = document.createElement("span");
+      name.textContent = SKILL_LABELS[key];
+      const val = document.createElement("span");
+      val.className = "skill-val";
+      val.textContent = `${s.correct}/${s.total}`;
+      head.append(name, val);
+
+      const bar = document.createElement("div");
+      bar.className = "skill-bar";
+      const fill = document.createElement("div");
+      fill.className = "skill-fill";
+      fill.style.width = `${pct}%`;
+      bar.appendChild(fill);
+
+      row.append(head, bar);
       wrap.appendChild(row);
     }
   }

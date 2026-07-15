@@ -132,8 +132,22 @@ class AdaptiveEngine {
     const n = this.answers.length;
     if (n >= this.cfg.maxQuestions) return true;
     if (n >= this.cfg.minQuestions && this.se <= this.cfg.seTarget) return true;
-    if (this.nextQuestion() === null) return true;
+    if (n >= this.pool.length) return true; // пул исчерпан
     return false;
+  }
+
+  /**
+   * Прогресс теста 0…1 для индикатора: максимум из доли заданных вопросов
+   * и «точности измерения» (насколько SE упала от априорной к целевой).
+   * Достигает 1 ровно тогда, когда тест готов завершиться.
+   */
+  progress() {
+    const byCount = this.answers.length / this.cfg.maxQuestions;
+    const byPrecision = Math.min(
+      (this.cfg.priorSd - this.se) / (this.cfg.priorSd - this.cfg.seTarget),
+      this.answers.length / this.cfg.minQuestions
+    );
+    return Math.max(0, Math.min(1, Math.max(byCount, byPrecision)));
   }
 
   /** Итог: уровень CEFR, уверенность и статистика. */
@@ -145,8 +159,6 @@ class AdaptiveEngine {
     for (const band of CEFR_BANDS) {
       if (this.theta <= band.max) { level = band.level; break; }
     }
-    // Страховка: почти нет правильных ответов — начинающий.
-    if (total > 0 && correctCount / total < 0.15 && this.theta < -1.5) level = "A0";
 
     // «Уверенность» — вероятность того, что истинный θ лежит в границах
     // определённого уровня (масса апостериорного распределения в полосе).
