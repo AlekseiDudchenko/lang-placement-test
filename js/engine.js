@@ -1,5 +1,6 @@
 /**
- * Адаптивный движок на основе однопараметрической IRT-модели (модель Раша).
+ * Адаптивный движок на основе IRT: 2PL-модель с единой для всех заданий
+ * дискриминацией a (эквивалентна модели Раша в перемасштабированных логитах).
  *
  * Идея:
  *  1. Способность θ оценивается байесовски (EAP) после каждого ответа.
@@ -101,7 +102,7 @@ class AdaptiveEngine {
     // новичков; дальше ориентируемся на текущую оценку θ.
     const target = this.answers.length === 0 ? -0.6 : this.theta;
     const info = (q) => {
-      const p = AdaptiveEngine.pCorrect(target, q.b);
+      const p = AdaptiveEngine.pCorrect(target, q.b, this.cfg.discrimination);
       return p * (1 - p);
     };
     const ranked = available.slice().sort((a, b) => info(b) - info(a));
@@ -120,7 +121,7 @@ class AdaptiveEngine {
   /** Зафиксировать ответ и пересчитать оценку способности. */
   recordAnswer(question, correct) {
     for (let i = 0; i < this.grid.length; i++) {
-      const p = AdaptiveEngine.pCorrect(this.grid[i], question.b);
+      const p = AdaptiveEngine.pCorrect(this.grid[i], question.b, this.cfg.discrimination);
       this.posterior[i] *= correct ? p : 1 - p;
     }
     this._normalize();

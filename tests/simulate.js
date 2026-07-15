@@ -75,6 +75,18 @@ const allWrong = new AdaptiveEngine(QUESTIONS);
 while (!allWrong.isFinished()) allWrong.recordAnswer(allWrong.nextQuestion(), false);
 check(allWrong.result().level === "A0", "все ответы неверны → должен быть A0");
 
+// Кастомная дискриминация из config должна реально влиять на оценку
+// (регрессия: раньше pCorrect брал a из глобального ENGINE_CONFIG).
+const { ENGINE_CONFIG } = require(path.join(__dirname, "..", "js", "engine.js"));
+const cfgLowA = { ...ENGINE_CONFIG, discrimination: 0.5 };
+const eDefault = new AdaptiveEngine(QUESTIONS);
+const eLowA = new AdaptiveEngine(QUESTIONS, cfgLowA);
+const sameItem = QUESTIONS[0];
+eDefault.recordAnswer(sameItem, true);
+eLowA.recordAnswer(sameItem, true);
+check(Math.abs(eDefault.theta - eLowA.theta) > 1e-6,
+  "config.discrimination должен влиять на пересчёт оценки");
+
 // Прогресс монотонно достигает 1 к моменту завершения.
 const e = new AdaptiveEngine(QUESTIONS);
 check(e.progress() === 0, "прогресс до начала должен быть 0");
